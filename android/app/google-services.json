@@ -1,0 +1,48 @@
+{
+    "project_info": {
+      "project_number": "1085975207049",
+      "project_id": "mobileprogrammingfinal-41332",
+      "storage_bucket": "mobileprogrammingfinal-41332.firebasestorage.app"
+    },
+    "client": [
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:1085975207049:android:cc1b478c1bd259ce7b3a58",
+          "android_client_info": {
+            "package_name": "com.example.finalmobileprogramming"
+          }
+        },
+        "oauth_client": [],
+        "api_key": [
+          {
+            "current_key": "AIzaSyDrx6EKIfQcx4OTitqOwgkTRMvfz7O5t_M"
+          }
+        ],
+        "services": {
+          "appinvite_service": {
+            "other_platform_oauth_client": []
+          }
+        }
+      },
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:1085975207049:android:aab496557ad7fb237b3a58",
+          "android_client_info": {
+            "package_name": "com.example.mobileprogramming"
+          }
+        },
+        "oauth_client": [],
+        "api_key": [
+          {
+            "current_key": "AIzaSyDrx6EKIfQcx4OTitqOwgkTRMvfz7O5t_M"
+          }
+        ],
+        "services": {
+          "appinvite_service": {
+            "other_platform_oauth_client": []
+          }
+        }
+      }
+    ],
+    "configuration_version": "1"
+  }
