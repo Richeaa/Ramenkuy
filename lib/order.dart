@@ -32,16 +32,27 @@ class _OrderPageState extends State<OrderPage> {
   }
 
   void _placeOrder() async {
-    if (Cart.items.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Your cart is empty!")),
-      );
-      return;
+  if (Cart.items.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Your cart is empty!")),
+    );
+    return;
+  }
+
+     int totalOrderPrice = 0;
+    for (var item in Cart.items) {
+    final int basePrice = int.tryParse(item['basePrice'] ?? '0') ?? 0;
+    final int quantity = item['quantity'] as int;
+    totalOrderPrice += basePrice * quantity;
     }
+
+  final String formattedTotalPrice = "${totalOrderPrice}k";
+
 
     try {
       await _firestore.collection('orders').add({
         'items': Cart.items,
+        'totalPrice': formattedTotalPrice,
         'timestamp': FieldValue.serverTimestamp(),
       });
 
@@ -50,15 +61,30 @@ class _OrderPageState extends State<OrderPage> {
         Cart.items.clear();
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Order placed successfully!")),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error placing order: $e")),
-      );
-    }
+      showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Order Placed"),
+          content: Text(
+            "Thank you for your order!\n\nTotal Price: Rp ${totalOrderPrice}k",
+            style: const TextStyle(fontSize: 18),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(), // Close the dialog
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error placing order: $e")),
+    );
   }
+}
 
   Future<bool> _showExitConfirmation(BuildContext context) async {
     final shouldExit = await showDialog<bool>(
@@ -112,52 +138,57 @@ class _OrderPageState extends State<OrderPage> {
                       ),
                     )
                   : ListView.builder(
-                      padding: const EdgeInsets.all(16.0),
-                      itemCount: Cart.items.length,
-                      itemBuilder: (context, index) {
-                        final item = Cart.items[index];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(vertical: 10),
-                          child: ListTile(
-                            leading: Image.asset(
-                              item['image']!,
-                              width: 60,
-                              height: 60,
-                              fit: BoxFit.cover,
-                            ),
-                            title: Text(
-                              item['name']!,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item['price']!,
-                                  style: const TextStyle(color: Colors.orange),
-                                ),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.remove_circle, color: Colors.red),
-                                      onPressed: () => _decrementQuantity(index),
-                                    ),
-                                    Text(
-                                      '${item['quantity']}',
-                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.add_circle, color: Colors.green),
-                                      onPressed: () => _incrementQuantity(index),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+  padding: const EdgeInsets.all(16.0),
+  itemCount: Cart.items.length,
+  itemBuilder: (context, index) {
+    final item = Cart.items[index];
+    final int basePrice = int.tryParse(item['basePrice'] ?? '0') ?? 0; // Ensure basePrice is an integer
+final int quantity = item['quantity'] as int; // Cast quantity to an integer
+final int totalPrice = basePrice * quantity; // Calculate total price // Calculate the total price
+
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: ListTile(
+        leading: Image.asset(
+          item['image']!,
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+        ),
+        title: Text(
+          item['name']!,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Rp ${totalPrice.toString()}k", // Display updated total price
+              style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+            ),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.remove_circle, color: Colors.red),
+                  onPressed: () => _decrementQuantity(index),
+                ),
+                Text(
+                  '${item['quantity']}',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_circle, color: Colors.green),
+                  onPressed: () => _incrementQuantity(index),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  },
+)
+,
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
