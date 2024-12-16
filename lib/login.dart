@@ -1,9 +1,12 @@
+import 'package:finalmobileprogramming/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:finalmobileprogramming/signup.dart';
 import 'menu.dart'; // Ensure SignupScreen or RegisterPage exists
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -90,7 +93,10 @@ class _LoginPageState extends State<LoginPage> {
                 color: Colors.black,
               ),
               onPressed: () {
-                Navigator.pop(context); // Navigate back to the previous screen
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => WelcomePage()), // Replace MainPage with your main/home screen
+                );
               },
             ),
           ),

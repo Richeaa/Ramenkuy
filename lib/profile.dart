@@ -4,13 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'menu.dart';
 import 'order.dart';
+import 'setaddress.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalmobileprogramming/login.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
-
-
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -26,11 +25,13 @@ class _ProfilePageState extends State<ProfilePage> {
   User? user;
   String? username;
   String? profileImageBase64;
+  String? userAddress;
   final TextEditingController usernameController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _fetchUserAddress();
     user = _auth.currentUser;
     if (user != null) {
       _loadUserData();
@@ -49,11 +50,26 @@ class _ProfilePageState extends State<ProfilePage> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load user data')),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text('Failed to load user data')),
+      // );
     }
   }
+
+  Future<void> _fetchUserAddress() async {
+  try {
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .get();
+    
+    setState(() {
+      userAddress = userDoc.get('address');
+    });
+  } catch (e) {
+    print("Error fetching user address: $e");
+  }
+}
 
   Future<void> _saveUsername() async {
   if (usernameController.text.isNotEmpty) {
@@ -88,7 +104,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 }
-
 
   Future<void> _logout() async {
   await _auth.signOut();
@@ -133,7 +148,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<String> compressAndEncode(File imageFile) async {
     final image = img.decodeImage(await imageFile.readAsBytes());
-    final resizedImage = img.copyResize(image!, width: 300); // Resize to 300px width
+    final resizedImage = img.copyResize(image!, width: 300);
     return base64Encode(img.encodeJpg(resizedImage));
   }
 
@@ -142,9 +157,8 @@ class _ProfilePageState extends State<ProfilePage> {
       if (user == null) throw Exception('No user logged in');
       if (!imageFile.existsSync()) throw Exception('Image file does not exist');
 
-      // Convert image to string
       String base64Image = await compressAndEncode(imageFile);
-      // Save
+
       await _firestore
           .collection('users')
           .doc(user!.uid)
@@ -325,6 +339,15 @@ class _ProfilePageState extends State<ProfilePage> {
     return shouldExit ?? false;
   }
 
+  ButtonStyle commonButtonStyle(Color color) {
+  return ElevatedButton.styleFrom(
+    backgroundColor: color,
+    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(30),
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -400,7 +423,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
                 TextField(
                   controller: usernameController,
                   decoration: InputDecoration(
@@ -431,15 +454,33 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _saveUsername,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF003366),
-                    padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                TextField(
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.location_on, color: Colors.grey),
+                    hintText: userAddress ?? 'Set Address', // Add a userAddress variable
+                    labelStyle: const TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide.none,
                     ),
                   ),
+                  onTap: () {
+                    // Navigate to SetAddressPage when tapped
+                    Navigator.push(
+                      context, 
+                      MaterialPageRoute(builder: (context) => SetAddressPage())
+                    ).then((_) {
+                      _fetchUserAddress();
+                    });
+                  },
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _saveUsername,
+                  style: commonButtonStyle(Color(0xFF003366)),
                   child: const Text(
                     'Save',
                     style: TextStyle(
@@ -451,13 +492,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _logout,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
+                  style: commonButtonStyle(Colors.red),
                   child: const Text(
                     'Log Out',
                     style: TextStyle(
@@ -470,13 +505,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _deleteAccount,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent.shade700,
-                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
+                  style: commonButtonStyle(Colors.red),
                   child: const Text(
                     'Delete Account',
                     style: TextStyle(
