@@ -1,6 +1,6 @@
 # finalmobileprogramming
 
-A new Flutter project.
+Restaurant Project.
 
 ## Getting Started
 
