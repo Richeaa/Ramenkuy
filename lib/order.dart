@@ -143,8 +143,8 @@ class _OrderPageState extends State<OrderPage> {
   itemBuilder: (context, index) {
     final item = Cart.items[index];
     final int basePrice = int.tryParse(item['basePrice'] ?? '0') ?? 0; // Ensure basePrice is an integer
-final int quantity = item['quantity'] as int; // Cast quantity to an integer
-final int totalPrice = basePrice * quantity; // Calculate total price // Calculate the total price
+    final int quantity = item['quantity'] as int; // Cast quantity to an integer
+    final int totalPrice = basePrice * quantity; // Calculate total price 
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10),

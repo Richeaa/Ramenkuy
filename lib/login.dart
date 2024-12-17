@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
   context,
   PageRouteBuilder(
-    transitionDuration: const Duration(milliseconds: 1000), // Durasi animasi
+    transitionDuration: const Duration(milliseconds: 500), // Durasi animasi
     pageBuilder: (context, animation, secondaryAnimation) => MainRamen(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(1.0, 0.0); // Halaman masuk dari kanan

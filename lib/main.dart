@@ -1,13 +1,29 @@
+import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'dart:async';
 import 'package:finalmobileprogramming/profile.dart';
 import 'package:flutter/services.dart';
+import 'firebase_messaging.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'login.dart';
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print('Handling a background message: ${message.messageId}');
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Firebase
   await Firebase.initializeApp();
+  
+  // Register background message handler
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  
+  // Initialize Firebase In-App Messaging
+  await FirebaseInAppMessagingService.initialize();
+
   runApp(MyApp());
 }
 
