@@ -4,6 +4,11 @@
 
 This project represents a culmination of what we've learned during the semester, integrating UI/UX principles, state management, and backend interaction using cloud services.
 
+## 👋 Preview
+![](Screen1.png)
+![](Screen2.png)
+![](Screen3.png)
+
 ## 📱 Features
 
 - 🧾 **Order Menu** — Browse a selection of ramen dishes with prices and details.
@@ -16,3 +21,4 @@ This project represents a culmination of what we've learned during the semester,
 - **Dart** — Programming language
 - **Flutter** — Framework for building cross-platform mobile applications
 - **Firebase** — Cloud backend (authentication, database, and/or storage)
+
